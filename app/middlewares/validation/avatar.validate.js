@@ -5,15 +5,15 @@ exports.validateAvatar = [
     .not()
     .isEmpty()
     .withMessage("UserId can not be empty!")
-    .isNumeric(),
-  // .isAlphanumeric()
-  // .withMessage("Invalid ID!")
-  check("scr").not().isEmpty().withMessage("No source link provided!").isURL(),
-  check("size")
+    .isNumeric()
+    .withMessage("Invalid ID!"),
+  check("scr")
     .not()
     .isEmpty()
     .withMessage("No source link provided!")
-    .isDecimal(),
+    .isURL()
+    .withMessage("Invalid url!"),
+  check("size").not().isEmpty().withMessage("Size is required!").isFloat(),
 ];
 
 exports.avatarValidation = (req, res, next) => {
