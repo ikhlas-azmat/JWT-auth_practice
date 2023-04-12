@@ -17,8 +17,8 @@ const port = process.env.PORT || 8000;
 
 connection.sequelize
   .sync({ force: false })
-  .then(() => console.log("connected to db"))
-  .catch((err) => console.log("connection failed", err));
+  .then(() => console.log("synced successfully."))
+  .catch((err) => console.log("sync failed", err));
 
 app.listen(port, () => console.log(`app is listening to ${port}`));
 

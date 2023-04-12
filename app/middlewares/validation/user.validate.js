@@ -38,7 +38,7 @@ exports.validateCreateUser = [
     .isEmpty()
     .withMessage("Password is required!")
     .isLength({ min: 8 })
-    .withMessage("Password must be at least 8 characters Long!"),
+    .withMessage("Password must be at least 8 characters long!"),
   check("confirmPassword")
     .not()
     .isEmpty()

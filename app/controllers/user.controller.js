@@ -1,10 +1,14 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user.model");
+const db = require("../models/");
 const bcrypt = require("bcrypt");
+const config = require("../config/db.config");
+
+const User = db.user;
 
 exports.createUser = async (req, res) => {
   try {
-    const isNewUserEmail = User.findOne({ email: email });
+    const { username, email, password, confirmPassword } = req.body;
+    const isNewUserEmail = await User.findOne({ where: { email: email } });
     if (isNewUserEmail) {
       res.status(409).json({
         status: "failed",
@@ -12,18 +16,129 @@ exports.createUser = async (req, res) => {
       });
       return false;
     } else {
-      if (req.body.password === req.body.confirmPassword) {
-        const userData = await User.create(req.body);
-        if (userData) {
-          res.status(200).json({
-            status: "success",
-            message: "User created!",
-            userData,
+      if (username && email && password && confirmPassword) {
+        if (password === confirmPassword) {
+          try {
+            const salt = await bcrypt.genSalt(10);
+            const hashPassword = await bcrypt.hash(password, salt);
+            const userData = await User.create({
+              username: username,
+              email: email,
+              password: hashPassword,
+            });
+            if (userData) {
+              const saveUser = await User.findOne({ where: { email: email } });
+              const token = jwt.sign(
+                { UserId: saveUser.id },
+                config.auth.secret,
+                {
+                  expiresIn: "3d",
+                }
+              );
+              res.status(201).json({
+                status: "success",
+                message: "User created!",
+                userData: userData,
+                token: token,
+              });
+            }
+          } catch (error) {
+            console.log(error);
+            res
+              .status(500)
+              .json({ status: "failed", message: "Unable to Register!" });
+          }
+        } else {
+          res.status(400).json({
+            status: "failed",
+            message: "Password and Confirm Password do not match!",
           });
         }
+      } else {
+        res.status(400).json({
+          status: "failed",
+          message: "All fields are required!",
+        });
       }
     }
   } catch (error) {
-    res.status(500).json({ status: "failed", error: error });
+    console.log(error);
+  }
+};
+
+exports.signIn = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (email && password) {
+      const userData = await User.findOne({ where: { email: email } });
+      if (userData != null) {
+        const isMatch = await bcrypt.compare(password, userData.password);
+        if (userData.email === email && isMatch) {
+          const token = jwt.sign({ userId: userData.id }, config.auth.secret, {
+            expiresIn: "3d",
+          });
+          res.status(201).json({
+            status: "success",
+            message: "Login successful!",
+            userData: [userData.id, userData.email],
+            token: token,
+          });
+        } else {
+          res.status(400).json({
+            status: "failed",
+            message: "Email and/or Password is Invalid!",
+          });
+        }
+      } else {
+        res.status(400).json({ status: "failed", message: "Missing fields!" });
+      }
+    } else {
+      res.status(500).json({ status: "failed", message: "Unable to Login!" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.getAll = async (req, res) => {
+  try {
+    const userData = await User.findAll({
+      attribute: ["id", "username", "email"],
+    });
+    if (userData != null) {
+      res
+        .status(200)
+        .json({ status: "success", message: "Showing all users!", userData });
+    } else {
+      res
+        .status(400)
+        .json({ status: "failed", message: "Failed to get users" });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: "failed", message: "Unexpected error occured!" });
+  }
+};
+
+exports.getById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userData = await User.findOne({
+      where: { id: id },
+    });
+    if (userData != null) {
+      res
+        .status(200)
+        .json({ status: "success", message: "Found user!", userData });
+    } else {
+      res.status(400).json({ status: "failed", message: "User not found!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: "failed", message: "Unexpected error occured!" });
   }
 };

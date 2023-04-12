@@ -28,11 +28,11 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       },
       created_at: {
         type: DataTypes.DATE,
-        defaultValue: Sequelize.fn("now"),
+        // defaultValue: Sequelize.fn("now"),
       },
       updated_at: {
         type: DataTypes.DATE,
-        defaultValue: null,
+        // defaultValue: null,
       },
     },
     {
