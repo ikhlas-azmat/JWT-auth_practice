@@ -16,7 +16,7 @@ app.use(cors());
 const port = process.env.PORT || 8000;
 
 connection.sequelize
-  .sync({ force: false })
+  .sync({ alter: false }) // force: true
   .then(() => console.log("synced successfully."))
   .catch((err) => console.log("sync failed", err));
 

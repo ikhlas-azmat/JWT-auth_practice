@@ -12,7 +12,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         allowNull: false,
       },
       size: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.FLOAT,
         allowNull: false,
       },
       created_at: {

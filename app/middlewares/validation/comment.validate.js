@@ -4,15 +4,20 @@ exports.validateComment = [
   check("userId")
     .not()
     .isEmpty()
-    .withMessage("UserId can not be empty!")
+    .withMessage("UserId is required!")
     .isNumeric()
     .withMessage("Invalid ID!"),
   check("photoId")
     .not()
     .isEmpty()
-    .withMessage("PhotoId can not be empty!")
+    .withMessage("PhotoId is required!")
     .isNumeric()
     .withMessage("Invalid ID!"),
+  check("body")
+    .not()
+    .isEmpty()
+    .withMessage("Comment can not be empty!")
+    .isLength({ max: 250 }),
 ];
 
 exports.commentValidation = (req, res, next) => {

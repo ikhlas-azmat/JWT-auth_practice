@@ -2,9 +2,12 @@ const router = require("express").Router();
 const {
   createUser,
   signIn,
-  getAll,
-  getById,
+  getAllUserProfiles,
+  getUserProfileById,
+  getAllPosts,
+  getPostById,
 } = require("../controllers/user.controller");
+const { isAuth } = require("../middlewares/auth");
 const {
   userValidation,
   validateCreateUser,
@@ -15,10 +18,10 @@ const {
 router.post("/signup", validateCreateUser, userValidation, createUser);
 router.post("/signin", validateUserSignIn, userValidation, signIn);
 
-// get
-router.get("/", getAll);
-router.get("/:id", getById);
-
 // protected
+router.get("/profiles", isAuth, getAllUserProfiles);
+router.get("/profiles/:id", isAuth, getUserProfileById);
+router.get("/posts", isAuth, getAllPosts);
+router.get("/posts/:id", isAuth, getPostById);
 
 module.exports = router;

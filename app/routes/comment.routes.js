@@ -1,11 +1,11 @@
 const router = require("express").Router();
-const {} = require("../controllers/comment.controller");
+const { createComment } = require("../controllers/comment.controller");
+const { isAuth } = require("../middlewares/auth");
 const {
   commentValidation,
   validateComment,
 } = require("../middlewares/validation/comment.validate");
 
-router.post("/", validateComment, commentValidation);
-router.get("/");
+router.post("/", isAuth, createComment, validateComment, commentValidation);
 
 module.exports = router;

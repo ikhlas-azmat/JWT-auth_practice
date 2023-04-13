@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const config = require("../config/db.config");
 
 const User = db.user;
+const Photo = db.photo;
+const Comment = db.comment;
 
 exports.createUser = async (req, res) => {
   try {
@@ -100,10 +102,14 @@ exports.signIn = async (req, res) => {
   }
 };
 
-exports.getAll = async (req, res) => {
+exports.getAllUserProfiles = async (req, res) => {
   try {
     const userData = await User.findAll({
-      attribute: ["id", "username", "email"],
+      attributes: {
+        exclude: ["id", "password", "updated_at"],
+      },
+      offset: 0,
+      limit: 10,
     });
     if (userData != null) {
       res
@@ -122,11 +128,12 @@ exports.getAll = async (req, res) => {
   }
 };
 
-exports.getById = async (req, res) => {
+exports.getUserProfileById = async (req, res) => {
   try {
     const id = req.params.id;
     const userData = await User.findOne({
       where: { id: id },
+      attributes: { exclude: ["password"] },
     });
     if (userData != null) {
       res
@@ -134,6 +141,68 @@ exports.getById = async (req, res) => {
         .json({ status: "success", message: "Found user!", userData });
     } else {
       res.status(400).json({ status: "failed", message: "User not found!" });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: "failed", message: "Unexpected error occured!" });
+  }
+};
+
+exports.getAllPosts = async (req, res) => {
+  try {
+    const userData = await User.findAll({
+      attributes: {
+        exclude: [["id", "uid"], "password", "created_at", "updated_at"],
+      },
+      include: {
+        model: Photo,
+        attributes: { exclude: [["id", "pid"], "userId", "size"] },
+        // required: true,
+        include: {
+          model: Comment,
+        },
+      },
+      offset: 0,
+      limit: 10,
+      // raw: true,
+      // nest: true,
+    });
+    if (userData != null) {
+      res
+        .status(200)
+        .json({ status: "success", message: "Showing all posts!", userData });
+    } else {
+      res
+        .status(400)
+        .json({ status: "failed", message: "Failed to get posts" });
+    }
+  } catch (error) {
+    console.log(error);
+    res
+      .status(500)
+      .json({ status: "failed", message: "Unexpected error occured!" });
+  }
+};
+
+exports.getPostById = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const userData = await User.findOne({
+      attributes: { exclude: [["id", "uid"], "password"] },
+      include: {
+        model: Photo,
+        attributes: { exclude: [["id", "pid"], "userId"] },
+      },
+      where: { id: id },
+    });
+    if (userData != null) {
+      res
+        .status(200)
+        .json({ status: "success", message: "Found post!", userData });
+    } else {
+      res.status(400).json({ status: "failed", message: "Post not found!" });
     }
   } catch (error) {
     console.log(error);

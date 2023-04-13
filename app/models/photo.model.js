@@ -10,19 +10,19 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: false,
       },
-      latitude: DataTypes.DECIMAL,
-      longitude: DataTypes.DECIMAL,
+      latitude: DataTypes.FLOAT,
+      longitude: DataTypes.FLOAT,
       scr: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
       size: {
-        type: DataTypes.DECIMAL(10, 2),
+        type: DataTypes.FLOAT, // DECIMAL(10, 2)
         allowNull: false,
       },
       created_at: {
         type: DataTypes.DATE,
-        defaultValue: Sequelize.fn("now"),
+        // defaultValue: Sequelize.fn("now"),
       },
       updated_at: {
         type: DataTypes.DATE,
