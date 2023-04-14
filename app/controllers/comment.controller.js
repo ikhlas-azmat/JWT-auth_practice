@@ -3,8 +3,8 @@ const Comment = db.comment;
 
 exports.createComment = async (req, res) => {
   try {
-    const commentData = req.body;
-    const data = await Comment.create(commentData);
+    const messageData = req.body;
+    const data = await Comment.create(messageData);
     if (data) {
       res.status(201).json({
         status: "success",

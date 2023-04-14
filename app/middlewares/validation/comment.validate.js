@@ -13,7 +13,7 @@ exports.validateComment = [
     .withMessage("PhotoId is required!")
     .isNumeric()
     .withMessage("Invalid ID!"),
-  check("body")
+  check("message")
     .not()
     .isEmpty()
     .withMessage("Comment can not be empty!")

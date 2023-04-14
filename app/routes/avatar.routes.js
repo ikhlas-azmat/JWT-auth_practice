@@ -1,11 +1,12 @@
 const router = require("express").Router();
-const {} = require("../controllers/avatar.controller");
+const { getAvatar, createAvatar } = require("../controllers/avatar.controller");
+const { isAuth } = require("../middlewares/auth");
 const {
   avatarValidation,
   validateAvatar,
 } = require("../middlewares/validation/avatar.validate");
 
-router.post("/", validateAvatar, avatarValidation);
-router.get("/");
+router.post("/", isAuth, createAvatar, validateAvatar, avatarValidation);
+router.get("/:id", getAvatar);
 
 module.exports = router;

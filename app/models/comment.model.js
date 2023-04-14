@@ -10,11 +10,15 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      body: {
+      message: {
         type: DataTypes.TEXT,
         allowNull: false,
       },
       created_at: {
+        type: DataTypes.DATE,
+        // defaultValue: Sequelize.fn("now"),
+      },
+      updated_at: {
         type: DataTypes.DATE,
         // defaultValue: Sequelize.fn("now"),
       },
@@ -23,7 +27,7 @@ module.exports = (sequelize, Sequelize, DataTypes) => {
       timestamps: true,
       underScored: true,
       createdAt: "created_at",
-      updatedAt: false,
+      updatedAt: "updated_at",
     }
   );
   return Comment;
