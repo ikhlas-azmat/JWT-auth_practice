@@ -2,7 +2,9 @@ const jwt = require("jsonwebtoken");
 const db = require("../models/");
 const bcrypt = require("bcrypt");
 const config = require("../config/db.config");
+const { QueryTypes } = require("sequelize");
 
+const sequelize = db.sequelize;
 const User = db.user;
 const Photo = db.photo;
 const Comment = db.comment;
@@ -210,4 +212,19 @@ exports.getPostById = async (req, res) => {
       .status(500)
       .json({ status: "failed", message: "Unexpected error occured!" });
   }
+};
+
+exports.findAllquery = async (req, res) => {
+  const data = await sequelize.query(
+    `SELECT username, email, caption, scr, message
+     FROM users u
+     LEFT JOIN photos p
+     ON u.id = p.userId
+     LEFT JOIN comments c
+     ON u.id = c.userId`,
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+  res.send(data);
 };

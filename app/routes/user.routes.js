@@ -6,6 +6,7 @@ const {
   getUserProfileById,
   getAllPosts,
   getPostById,
+  findAllquery,
 } = require("../controllers/user.controller");
 const { isAuth } = require("../middlewares/auth");
 const {
@@ -23,5 +24,6 @@ router.get("/profiles", isAuth, getAllUserProfiles);
 router.get("/profiles/:id", isAuth, getUserProfileById);
 router.get("/posts", isAuth, getAllPosts);
 router.get("/posts/:id", isAuth, getPostById);
+router.get("/query", isAuth, findAllquery);
 
 module.exports = router;
