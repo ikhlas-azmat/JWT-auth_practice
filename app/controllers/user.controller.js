@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const db = require("../models/");
 const bcrypt = require("bcrypt");
 const config = require("../config/db.config");
-const { QueryTypes } = require("sequelize");
+const { QueryTypes, Sequelize } = require("sequelize");
 
 const sequelize = db.sequelize;
 const User = db.user;
@@ -227,4 +227,60 @@ exports.findAllquery = async (req, res) => {
     }
   );
   res.send(data);
+};
+
+exports.countUsers = async (req, res) => {
+  try {
+    const data = await User.findAll({
+      attributes: {
+        exclude: ["password"],
+      },
+      include: {
+        model: Photo,
+        required: true,
+        attributes: {
+          exclude: ["photos.id"],
+          include: [
+            [sequelize.fn("COUNT", sequelize.col("scr")), "total_photos"],
+          ],
+        },
+        include: {
+          model: Comment,
+          attributes: {
+            exclude: "comments.id",
+            include: [
+              [
+                sequelize.fn("COUNT", sequelize.col("message")),
+                "total_comments",
+              ],
+            ],
+          },
+        },
+      },
+      group: "user.id",
+    });
+    res.send({ data: data });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.countUserQuery = async (req, res) => {
+  try {
+    const data = await sequelize.query(
+      `SELECT username, COUNT(p.scr) AS total_photos, COUNT(c.message) AS total_comments
+      FROM users u
+      LEFT JOIN photos p
+      ON u.id = p.userId
+      LEFT JOIN comments c
+      ON u.id = c.userId
+      GROUP BY u.id`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+    res.send({ data: data });
+  } catch (error) {
+    console.log(error);
+  }
 };
