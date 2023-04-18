@@ -233,21 +233,38 @@ exports.countUsers = async (req, res) => {
   try {
     const data = await User.findAll({
       attributes: {
-        exclude: ["password"],
+        exclude: ["id", "password", "created_at", "updated_at"],
       },
       include: {
         model: Photo,
-        required: true,
         attributes: {
-          exclude: ["photos.id"],
+          exclude: [
+            "id",
+            "userId",
+            "caption",
+            "latitude",
+            "longitude",
+            "size",
+            "scr",
+            "created_at",
+            "updated_at",
+          ],
           include: [
             [sequelize.fn("COUNT", sequelize.col("scr")), "total_photos"],
           ],
         },
         include: {
           model: Comment,
+          required: true,
           attributes: {
-            exclude: "comments.id",
+            exclude: [
+              "id",
+              "userId",
+              "photoId",
+              "message",
+              "created_at",
+              "updated_at",
+            ],
             include: [
               [
                 sequelize.fn("COUNT", sequelize.col("message")),
@@ -258,6 +275,7 @@ exports.countUsers = async (req, res) => {
         },
       },
       group: "user.id",
+      raw: true,
     });
     res.send({ data: data });
   } catch (error) {
@@ -280,6 +298,63 @@ exports.countUserQuery = async (req, res) => {
       }
     );
     res.send({ data: data });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.createQuery = async (req, res) => {
+  try {
+    const { username, email, password, confirmPassword } = req.body;
+    const isNewEmail = await User.findOne({ where: { email: email } });
+    if (isNewEmail) {
+      res.status(409).json({
+        status: "failed",
+        message: "Email already exist!",
+      });
+    } else {
+      if ((username, email, password, confirmPassword)) {
+        if (password === confirmPassword) {
+          const salt = await bcrypt.genSalt(10);
+          const hashPassword = await bcrypt.hash(password, salt);
+          const data = await sequelize.query(
+            "INSERT INTO users (username, email, password) VALUES (?, ?, ?);",
+            {
+              type: QueryTypes.INSERT,
+              replacements: [username, email, hashPassword],
+            }
+          );
+          res
+            .status(201)
+            .json({ status: "success", message: "Inserted data!", data: data });
+        } else {
+          res.status(400).json({
+            status: "falied",
+            message: "Password and confirm password do not match!",
+          });
+        }
+      } else {
+        res
+          .status(400)
+          .json({ status: "failed", message: "All fields are required!" });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const user = await User.destroy({ where: { id: id } });
+    if (user) {
+      res.status(201).json({ status: "success", message: "Deleted user!" });
+    } else {
+      res
+        .status(400)
+        .json({ status: "failed", message: "User does not exist!" });
+    }
   } catch (error) {
     console.log(error);
   }

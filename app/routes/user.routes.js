@@ -9,6 +9,8 @@ const {
   findAllquery,
   countUsers,
   countUserQuery,
+  createQuery,
+  deleteUser,
 } = require("../controllers/user.controller");
 const { isAuth } = require("../middlewares/auth");
 const {
@@ -20,6 +22,7 @@ const {
 // post
 router.post("/signup", validateCreateUser, userValidation, createUser);
 router.post("/signin", validateUserSignIn, userValidation, signIn);
+router.post("/insert", validateCreateUser, userValidation, createQuery);
 
 // protected
 router.get("/profiles", isAuth, getAllUserProfiles);
@@ -28,6 +31,9 @@ router.get("/posts", isAuth, getAllPosts);
 router.get("/posts/:id", isAuth, getPostById);
 router.get("/query", isAuth, findAllquery);
 router.get("/count", countUsers);
-// router.get("/count", countUserQuery);
+router.get("/countquery", countUserQuery);
+
+// destroy
+router.delete("/delete", deleteUser);
 
 module.exports = router;
