@@ -359,3 +359,31 @@ exports.deleteUser = async (req, res) => {
     console.log(error);
   }
 };
+
+exports.deleteUserQuery = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const findId = await User.findByPk(id);
+    if (findId) {
+      sequelize
+        .query("DELETE FROM users WHERE id = " + id, {
+          type: QueryTypes.DELETE,
+          // replacements: [id],
+        })
+        .then(
+          res.status(201).json({ status: "success", message: "Deleted user!" })
+        )
+        .catch(
+          res
+            .status(400)
+            .json({ status: "failed", message: "Unexpected error!" })
+        );
+    } else {
+      res
+        .status(400)
+        .json({ status: "failed", message: "User does not exist!" });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};

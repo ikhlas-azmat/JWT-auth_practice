@@ -11,6 +11,7 @@ const {
   countUserQuery,
   createQuery,
   deleteUser,
+  deleteUserQuery,
 } = require("../controllers/user.controller");
 const { isAuth } = require("../middlewares/auth");
 const {
@@ -35,5 +36,6 @@ router.get("/countquery", countUserQuery);
 
 // destroy
 router.delete("/delete", deleteUser);
+router.delete("/deletequery", deleteUserQuery);
 
 module.exports = router;
